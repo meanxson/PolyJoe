@@ -2,12 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
+[ExecuteInEditMode]
 public class PolygonGen : MonoBehaviour
 {
     [Header("Polygon Settings")]
     public string label = "Joe";
-    public GameObject Joe;
+    [FormerlySerializedAs("Joe")] public GameObject polygon;
     [Range(3, 18)]
     public int vertexAmount = 3;
     [Range(1.0f, 10.0f)]
@@ -25,36 +27,22 @@ public class PolygonGen : MonoBehaviour
     public bool hasCollider = false;
     
     
-    private GameObject go;
-    private MeshFilter meshFilter;
-    private PolygonCollider2D coll;
+    private GameObject _go;
+    private MeshFilter _meshFilter;
+    private PolygonCollider2D _coll;
     private void Start()
     {
-        if (Joe != null)
-        {
-            go = Instantiate<GameObject>(Joe);
-        }
-        else
-        {
-            go = new GameObject(label);
-        }
-
+        _go = polygon != null ? polygon : gameObject;
         if (parent != null)
-        {
-            go.transform.SetParent(parent.transform);
-        }
-        go.transform.localPosition = Vector3.zero;
-        
-        MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial =
-            (material == null) ? new Material(Shader.Find("Standard")) : material;
-        
-        meshFilter = go.AddComponent<MeshFilter>();
-        
-        if(hasCollider)
-            coll = go.AddComponent<PolygonCollider2D>();
+            _go.transform.SetParent(parent.transform);
 
-       
+        MeshRenderer meshRenderer = (_go.GetComponent<MeshRenderer>() == null) ? _go.AddComponent<MeshRenderer>() : _go.GetComponent<MeshRenderer>();
+        meshRenderer.sharedMaterial = (material == null) ? new Material(Shader.Find("Standard")) : material;
+        _meshFilter = _go.GetComponent<MeshFilter>() == null ? _go.AddComponent<MeshFilter>() : _go.GetComponent<MeshFilter>();
+        if (hasCollider)
+            _coll = _go.GetComponent<PolygonCollider2D>() == null ? _go.AddComponent<PolygonCollider2D>() : _go.GetComponent<PolygonCollider2D>();
+
+
     }
 
 
@@ -92,7 +80,7 @@ public class PolygonGen : MonoBehaviour
         mesh.normals = normals;
         mesh.uv = uv;
 
-        meshFilter.mesh = mesh;
+        _meshFilter.mesh = mesh;
     }
 
     private void HoledPolyGen()
@@ -139,7 +127,7 @@ public class PolygonGen : MonoBehaviour
         mesh.normals = normals;
         mesh.uv = uv;
 
-        meshFilter.mesh = mesh;
+        _meshFilter.mesh = mesh;
     }
 
     private void AddCollider()
@@ -156,7 +144,7 @@ public class PolygonGen : MonoBehaviour
             verts[vertexAmount - i - 1] = new Vector2(x, y) * radius;
         }
 
-        coll.points = verts;
+        _coll.points = verts;
     }
         
     
