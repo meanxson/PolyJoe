@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 
 public class Movement : MonoBehaviour
 {
+    //Modifier Access will private for this class
     [Header("Inspector")]
     public float speed;
     public float jumpPower;
@@ -31,8 +32,7 @@ public class Movement : MonoBehaviour
     }
     
 
-    // Update is called once per frame
-    void FixedUpdate()
+   private void FixedUpdate()
     {
         velo = -Input.GetAxisRaw("Horizontal") * speed;
         dir = new Vector2(velo * Time.deltaTime, transform.position.y);
@@ -50,11 +50,14 @@ public class Movement : MonoBehaviour
             rigid.angularVelocity = -maxAngVelo;
         }
     }
+    
+    //TWO UPDATES IN ONE CLASS - BAD
+    //Movement class has Jump. Just create class Jumper and do jump mechanic. It will be easy to refactoring
     private void Update()
     {
-        onGround = Physics2D.OverlapCircle(transform.position, polygen.radius + jumpRadiusOffset , groundLayer);
+        onGround = Physics2D.OverlapCircle(transform.position, polygen.radius + jumpRadiusOffset , groundLayer); // +rep
 
-        if (Input.GetButtonDown("Jump") && onGround)
+        if (Input.GetButtonDown(KeyCode.Space) && onGround) //USE KeyCode, destroy fucking strings to check
         {
             var velocity = rigid.velocity;
             velocity = new Vector2(
